@@ -8,6 +8,6 @@ from wxcloudrun import db
 # 检查命令行参数
 
 if __name__ == '__main__':
-    app.run(host=sys.argv[1], port=sys.argv[2])
     with app.app_context():
         db.create_all()
+    app.run(host=sys.argv[1], port=sys.argv[2])
