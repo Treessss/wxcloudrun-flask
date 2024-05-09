@@ -267,7 +267,7 @@ def create_user_collection():
         return make_err_response({"error": "激活卡片失败，请稍后重试！"})
 
 
-@cards.route("/", methods=["POST"])
+@cards.route("", methods=["POST"])
 def create_cards():
     params = request.get_json()
 

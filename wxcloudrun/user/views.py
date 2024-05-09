@@ -8,7 +8,7 @@ from wxcloudrun.user import model
 from wxcloudrun.response import make_succ_empty_response, make_succ_response, make_err_response
 
 
-@user.route('/', methods=['POST'])
+@user.route('', methods=['POST'])
 def create_user():
     """
     获取请求头中的openid
@@ -36,7 +36,7 @@ def create_user():
         return make_succ_response({"id": user.id})
 
 
-@user.route('/', methods=['DELETE'])
+@user.route('', methods=['DELETE'])
 def delete_user():
     """
     获取请求头中的openid

@@ -10,7 +10,7 @@ from wxcloudrun import common
 from wxcloudrun.response import make_succ_empty_response, make_succ_response, make_err_response
 
 
-@warehouse.route('/', methods=['GET'])
+@warehouse.route('', methods=['GET'])
 def list_warehouse():
     wx_uid = common.get_wx_uid(request)
     if wx_uid is None:
@@ -66,7 +66,7 @@ def get_warehouse(warehouse_id):
     return make_succ_response(data)
 
 
-@warehouse.route('/', methods=['POST'])
+@warehouse.route('', methods=['POST'])
 def create_warehouse():
     wx_uid = common.get_wx_uid(request)
     if wx_uid is None:
