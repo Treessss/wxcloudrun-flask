@@ -210,6 +210,12 @@ def list_user_collection():
     # 获取所有图鉴
     illustrations = dao.list_illustrations_by_filter()
 
+    # 获取所有图鉴分类
+    category_data = {}
+    categories = dao.list_categories_by_filter()
+    for category in categories:
+        category_data[category.id] = category.name
+
     # 使用defaultdict来简化数据字典的创建，避免了显式检查和初始化的需要
     data = defaultdict(list)
     # 获取用户所激活的图鉴
@@ -225,8 +231,15 @@ def list_user_collection():
             "name": illustration.name,
             "file_id": illustration.activated_file_id if illustration.id in activated_illustrations else illustration.unactivated_file_id
         })
+    response = []
+    for key, value in data.items():
+        response.append({
+            "category_id": key,
+            "category_name": category_data[key],
+            "illustration": value
+        })
 
-    return make_succ_response(dict(data))
+    return make_succ_response(response)
 
 
 @cards.route('/user', methods=["POST"])

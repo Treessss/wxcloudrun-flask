@@ -16,7 +16,14 @@ def list_warehouse():
     if wx_uid is None:
         return make_err_response({"x-wx-openid is nil"})
 
-    warehouses = dao.list_warehouse_by_wxuid(wx_uid)
+    # Retrieve the search and buy_type parameters without removing Unicode characters
+    search = request.args.get('search', '').strip()
+    buy_type = request.args.get('buy_type', '').strip()
+
+    # Call the modified list_warehouse_by_wxuid function with the filter parameters
+    warehouses = dao.list_warehouse(wx_uid, search=search, buy_type=buy_type)
+
+    # Build the response data
     data = []
     if warehouses is not None:
         for warehouse in warehouses:

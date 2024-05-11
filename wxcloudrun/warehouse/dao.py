@@ -1,5 +1,6 @@
 import logging
 
+from sqlalchemy import desc
 from sqlalchemy.exc import OperationalError
 
 from wxcloudrun import db
@@ -9,17 +10,37 @@ from wxcloudrun.warehouse.model import Warehouse
 logger = logging.getLogger('log')
 
 
-def list_warehouse_by_wxuid(id):
+from sqlalchemy.exc import OperationalError
+
+def list_warehouse(id, search=None, buy_type=None):
     """
     根据ID查询user实体
-    :param id: Counter的ID
-    :return: Counter实体
+    :param id: User ID (Counter's ID)
+    :param search: String for searching warehouse names (optional)
+    :param buy_type: String for filtering by buy_type (optional)
+    :return: List of Warehouse entities matching the criteria
     """
     try:
-        return Warehouse.query.filter(Warehouse.user_id == id).all()
+        # Initialize the query with the user ID filter
+        query = Warehouse.query.filter(Warehouse.user_id == id)
+
+        # If a search string is provided, add the "ilike" filter to the query
+        if search:
+            search_pattern = f"%{search}%"
+            query = query.filter(Warehouse.name.ilike(search_pattern))
+
+        # If a buy_type is provided, add it as a filter
+        if buy_type:
+            query = query.filter(Warehouse.buy_type == buy_type)
+
+        # Sort results in descending order by buy_time
+        query = query.order_by(desc(Warehouse.created_at))
+
+        return query.all()
     except OperationalError as e:
-        logger.info("query_counterbyid errorMsg= {} ".format(e))
+        logger.info(f"query_counterbyid errorMsg= {e}")
         return None
+
 
 
 def get_warehouse_by_id(id):
