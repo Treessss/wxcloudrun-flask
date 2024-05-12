@@ -267,6 +267,14 @@ def create_user_collection():
     if user_collection:
         return make_err_response({"error": "此卡片已被激活！"})
 
+    illustrations = dao.list_illustrations_by_filter({"id": card.illustration_id})
+    if len(illustrations) == 0:
+        return make_err_response({"error": "卡片所属图鉴不存在，请确认后重试！"})
+
+    categories = dao.list_categories_by_filter({"id": illustrations[0].category_id})
+    if len(categories) == 0:
+        return make_err_response(({"error": "卡片所属分类不存在，请确认后重试！"}))
+
     user_collection = model.UserCollection()
     user_collection.id = uuid.uuid4()
     user_collection.user_id = wx_uid
@@ -275,7 +283,15 @@ def create_user_collection():
 
     try:
         dao.create_user_collection(user_collection)
-        return make_succ_response({"id": user_collection.id})
+        data = {
+            "id": user_collection.id,
+            "category_id": categories[0].id,
+            "category_name": categories[0].name,
+            "illustration_id": illustrations[0].id,
+            "illustration_name": illustrations[0].name,
+            "illustration_file_id": illustrations[0].activated_file_id
+        }
+        return make_succ_response(data)
     except Exception as e:
         return make_err_response({"error": "激活卡片失败，请稍后重试！"})
 
@@ -299,3 +315,17 @@ def create_cards():
         return make_succ_empty_response()
     except Exception as e:
         return make_err_response({"error": "批量创建卡片失败"})
+
+
+@cards.route('/user/count', methods=["GET"])
+def get_user_collection_count():
+    wx_uid = common.get_wx_uid(request)
+    if wx_uid is None:
+        return make_err_response({"error": "用户不存在，请重试！"})
+
+    filters = {"user_id": wx_uid}
+    user_collections = dao.list_user_collections_by_filter(filters)
+
+    count = len(user_collections)
+
+    return make_succ_response({"count": count})
