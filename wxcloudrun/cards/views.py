@@ -1,3 +1,4 @@
+import json
 import uuid
 from collections import defaultdict
 
@@ -233,6 +234,13 @@ def list_user_collection():
         })
     response = []
     for key, value in data.items():
+        if len(value):
+            while len(value) % 4 != 0 or len(value) == 4:
+                value.append({
+                    "id": str(uuid.uuid4()),
+                    "name": "问号",
+                    "file_id": "cloud://prod-3gg7rthva2e1757e.7072-prod-3gg7rthva2e1757e-1327531447/activate/kakuang.png"
+                })
         response.append({
             "category_id": key,
             "category_name": category_data[key],
