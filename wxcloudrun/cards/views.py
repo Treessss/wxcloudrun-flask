@@ -89,6 +89,9 @@ def list_illustration():
     illustrations = dao.list_illustrations_by_filter()
     data = []
     for illustration in illustrations:
+        if illustration.category_id not in ["9d8f656b-26f6-4b22-9cf9-eddd3e0614b1",
+                                            "df292868-e236-456e-8119-9daa212a1d3c"]:
+            continue
         x = {
             "id": illustration.id,
             "name": illustration.name,
