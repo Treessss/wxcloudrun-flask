@@ -283,7 +283,7 @@ def create_user_collection():
             return make_err_response(({"error": "卡片所属分类不存在，请确认后重试！"}))
 
         data = {
-            "id": uuid.uuid4(),
+            "id": str(uuid.uuid4()),
             "category_id": categories[0].id,
             "category_name": categories[0].name,
             "illustration_id": illustrations[0].id,
