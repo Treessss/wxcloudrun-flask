@@ -268,7 +268,7 @@ def create_user_collection():
     card_id = params["id"]
 
     # TODO 临时放开两张卡片做激活测试使用
-    if card_id in ["0434A5DAAA1C90", "043A47DAAA1C91"]:
+    if card_id in ["0434A5DAAA1C90", "043A47DAAA1C91","044C3ADAAA1C91"]:
         # 根据card_id去判断是否存在该卡片
         card = dao.get_card_by_id(card_id)
         if card is None:
