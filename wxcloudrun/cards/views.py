@@ -267,6 +267,31 @@ def create_user_collection():
 
     card_id = params["id"]
 
+    # TODO 临时放开两张卡片做激活测试使用
+    if card_id in ["0434A5DAAA1C90", "043A47DAAA1C91"]:
+        # 根据card_id去判断是否存在该卡片
+        card = dao.get_card_by_id(card_id)
+        if card is None:
+            return make_err_response({"error": "卡片不存在，请确认后重试！"})
+
+        illustrations = dao.list_illustrations_by_filter({"id": card.illustration_id})
+        if len(illustrations) == 0:
+            return make_err_response({"error": "卡片所属图鉴不存在，请确认后重试！"})
+
+        categories = dao.list_categories_by_filter({"id": illustrations[0].category_id})
+        if len(categories) == 0:
+            return make_err_response(({"error": "卡片所属分类不存在，请确认后重试！"}))
+
+        data = {
+            "id": uuid.uuid4(),
+            "category_id": categories[0].id,
+            "category_name": categories[0].name,
+            "illustration_id": illustrations[0].id,
+            "illustration_name": illustrations[0].name,
+            "illustration_file_id": illustrations[0].activated_file_id
+        }
+        return make_succ_response(data)
+
     # 根据card_id去判断是否存在该卡片
     card = dao.get_card_by_id(card_id)
     if card is None:
