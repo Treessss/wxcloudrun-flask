@@ -20,6 +20,7 @@ class Illustration(db.Model):
     category_id = db.Column(db.String(36), db.ForeignKey('categories.id'))  # 关联分类ID，外键
     activated_file_id = db.Column(db.String(255))  # 图鉴图片URL
     unactivated_file_id = db.Column(db.String(255))  # 图鉴图片URL
+    music_file_id = db.Column(db.String(255))  # 激活音频URL
     created_at = db.Column(db.Integer, nullable=False, default=int(datetime.now().timestamp()))  # 记录的创建时间（时间戳格式）
     updated_at = db.Column(db.Integer, nullable=False, default=int(datetime.now().timestamp()),
                            onupdate=int(datetime.now().timestamp()))  # 记录的更新时间（时间戳格式）

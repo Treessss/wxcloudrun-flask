@@ -325,7 +325,8 @@ def create_user_collection():
             "category_name": categories[0].name,
             "illustration_id": illustrations[0].id,
             "illustration_name": illustrations[0].name,
-            "illustration_file_id": illustrations[0].activated_file_id
+            "illustration_file_id": illustrations[0].activated_file_id,
+            "music_file_id": illustrations[0].music_file_id
         }
         return make_succ_response(data)
     except Exception as e:
