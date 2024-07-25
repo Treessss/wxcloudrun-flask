@@ -234,6 +234,7 @@ def list_user_collection():
             "id": illustration.id,
             "name": illustration.name,
             "file_id": illustration.activated_file_id if illustration.id in activated_illustrations else illustration.unactivated_file_id
+            "music_file_id": illustration.music_file_id
         })
     response = []
     for key, value in data.items():
@@ -242,7 +243,8 @@ def list_user_collection():
                 value.append({
                     "id": str(uuid.uuid4()),
                     "name": "问号",
-                    "file_id": "cloud://prod-3gg7rthva2e1757e.7072-prod-3gg7rthva2e1757e-1327531447/activate/kakuang.png"
+                    "file_id": "cloud://prod-3gg7rthva2e1757e.7072-prod-3gg7rthva2e1757e-1327531447/activate/kakuang.png",
+                    "music_file_id": ""
                 })
         response.append({
             "category_id": key,
@@ -268,7 +270,7 @@ def create_user_collection():
     card_id = params["id"]
 
     # TODO 临时放开两张卡片做激活测试使用
-    if card_id in ["0434A5DAAA1C90", "043A47DAAA1C91","044C3ADAAA1C91"]:
+    if card_id in ["0434A5DAAA1C90", "043A47DAAA1C91", "044C3ADAAA1C91"]:
         # 根据card_id去判断是否存在该卡片
         card = dao.get_card_by_id(card_id)
         if card is None:
