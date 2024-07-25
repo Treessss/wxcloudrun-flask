@@ -233,7 +233,7 @@ def list_user_collection():
         data[illustration.category_id].append({
             "id": illustration.id,
             "name": illustration.name,
-            "file_id": illustration.activated_file_id if illustration.id in activated_illustrations else illustration.unactivated_file_id
+            "file_id": illustration.activated_file_id if illustration.id in activated_illustrations else illustration.unactivated_file_id,
             "music_file_id": illustration.music_file_id
         })
     response = []
