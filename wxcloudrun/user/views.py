@@ -17,23 +17,74 @@ def create_user():
     不存在则创建后返回用户UUID
     :return:
     """
+    params = request.get_json()
+
     # 从请求头获取微信 OpenID
     wx_uid = common.get_wx_uid(request)
     if wx_uid is None:
         return make_err_response({"x-wx-openid is nil"})
 
-    # 判断openid是否存在
+    # 入参
+    tb_id = params.get("tb_id")
+    dy_id = params.get("dy_id")
+
+    if tb_id is None or dy_id is None:
+        return make_err_response({"error": "淘宝ID与抖音ID不能为空"})
+
+    # 判断wx_uid是否存在
     user = dao.query_user_by_id(wx_uid)
-    print(user)
     if user is None:
+        # 检查tb_id和dy_id是否已存在
+        existing_user = model.User.query.filter(
+            (model.User.tb_id == tb_id) | (model.User.dy_id == dy_id)
+        ).first()
+
+        if existing_user:
+            return make_err_response({"error": "淘宝ID与抖音ID已被绑定，请联系管理员！"})
+
         # 不存在则创建
         new_user = model.User()
         new_user.id = uuid.uuid4()
         new_user.wx_uid = wx_uid
+        new_user.tb_id = tb_id
+        new_user.dy_id = dy_id
         dao.insert_user(new_user)
-        return make_succ_response({"id": new_user.id})
+        return make_succ_response(
+            {
+                "wx_uid": new_user.wx_uid,
+                "tb_id": new_user.tb_id,
+                "dy_id": new_user.dy_id
+            }
+        )
     else:
-        return make_succ_response({"id": user.id})
+        return make_succ_response(
+            {
+                "wx_uid": user.wx_uid,
+                "tb_id": user.tb_id,
+                "dy_id": user.dy_id
+            }
+        )
+
+
+@user.route('', methods=['GET'])
+def get_user():
+    # 从请求头获取微信 OpenID
+    wx_uid = common.get_wx_uid(request)
+    if wx_uid is None:
+        return make_err_response({"error": "x-wx-openid is nil"})
+
+    # 判断wx_uid是否存在
+    user = dao.query_user_by_id(wx_uid)
+    if user is None:
+        return make_succ_response({})
+    else:
+        return make_succ_response(
+            {
+                "wx_uid": user.wx_uid,
+                "tb_id": user.tb_id,
+                "dy_id": user.dy_id
+            }
+        )
 
 
 @user.route('', methods=['DELETE'])
