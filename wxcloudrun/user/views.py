@@ -27,9 +27,10 @@ def create_user():
     # 入参
     tb_id = params.get("tb_id")
     dy_id = params.get("dy_id")
+    phone_number = params.get("phone_number")
 
-    if tb_id is None or dy_id is None:
-        return make_err_response({"error": "淘宝ID与抖音ID不能为空"})
+    if tb_id is None or dy_id is None or phone_number is None:
+        return make_err_response({"error": "手机号、淘宝ID与抖音ID不能为空"})
 
     # 判断wx_uid是否存在
     user = dao.query_user_by_id(wx_uid)
@@ -37,10 +38,11 @@ def create_user():
         # 检查tb_id和dy_id是否已存在
         existing_user = model.User.query.filter(
             (model.User.tb_id == tb_id) | (model.User.dy_id == dy_id)
+            | (model.User.phone_number == phone_number)
         ).first()
 
         if existing_user:
-            return make_err_response({"error": "淘宝ID与抖音ID已被绑定，请联系管理员！"})
+            return make_err_response({"error": "手机、淘宝ID与抖音ID已被绑定，请联系管理员！"})
 
         # 不存在则创建
         new_user = model.User()
@@ -48,12 +50,14 @@ def create_user():
         new_user.wx_uid = wx_uid
         new_user.tb_id = tb_id
         new_user.dy_id = dy_id
+        new_user.phone_number = phone_number
         dao.insert_user(new_user)
         return make_succ_response(
             {
                 "wx_uid": new_user.wx_uid,
                 "tb_id": new_user.tb_id,
-                "dy_id": new_user.dy_id
+                "dy_id": new_user.dy_id,
+                "phone_number": new_user.phone_number
             }
         )
     else:
@@ -61,7 +65,8 @@ def create_user():
             {
                 "wx_uid": user.wx_uid,
                 "tb_id": user.tb_id,
-                "dy_id": user.dy_id
+                "dy_id": user.dy_id,
+                "phone_number": user.phone_number
             }
         )
 
@@ -82,7 +87,8 @@ def get_user():
             {
                 "wx_uid": user.wx_uid,
                 "tb_id": user.tb_id,
-                "dy_id": user.dy_id
+                "dy_id": user.dy_id,
+                "phone_number": user.phone_nember
             }
         )
 

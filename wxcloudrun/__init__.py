@@ -22,6 +22,7 @@ from .warehouse import warehouse as warehouse_blueprint
 from .points import points as points_blueprint
 from .cards import cards as cards_blueprint
 from .user import user as user_blueprint
+from .weixin import wx as weixin_blueprint
 
 # 加载配置
 app.config.from_object('config')
@@ -29,3 +30,4 @@ app.register_blueprint(cards_blueprint, url_prefix='/api/cards')
 app.register_blueprint(warehouse_blueprint, url_prefix='/api/warehouse')
 app.register_blueprint(points_blueprint, url_prefix='/api/points')
 app.register_blueprint(user_blueprint, url_prefix='/api/user')
+app.register_blueprint(weixin_blueprint, url_prefix='/api/wx')
