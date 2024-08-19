@@ -88,7 +88,7 @@ def get_user():
                 "wx_uid": user.wx_uid,
                 "tb_id": user.tb_id,
                 "dy_id": user.dy_id,
-                "phone_number": user.phone_nember
+                "phone_number": user.phone_number
             }
         )
 
