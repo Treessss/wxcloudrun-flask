@@ -3,6 +3,7 @@ from flask import request
 
 from wxcloudrun import common
 from wxcloudrun.points import dao
+from wxcloudrun.user import dao as UserDao
 from wxcloudrun.points import model
 from wxcloudrun.points import points
 from wxcloudrun.response import make_succ_empty_response, make_succ_response, make_err_response
@@ -90,35 +91,28 @@ def create_user_point():
         # 检查该order_id是否已经被使用
         if order.is_used == 1:
             return make_err_response({"error": "该订单号已使用！"})
+        # 查询用户信息，确认抖音ID或,者淘宝ID是否一致
+        user = UserDao.query_user_by_id(wx_uid)
+        if user is None:
+            return make_err_response({"error": "用户信息不存在，请先注册登录！"})
+        if user.dy_id != order.user_name and user.tb_id != order.user_name:
+            return make_err_response({"error": "订单信息不属于你哦，请确认抖音ID或淘宝ID是否正确！"})
 
-    filters = {"user_id": wx_uid}
-    user_points = dao.list_user_points_by_filters(filters)
-    if user_points:
-        # 走更新接口
-        try:
-            user_points = user_points[0]
-            user_points.points = user_points.points + order.points
-            dao.update_user_point_by_id(user_points)
+    new_user_point = model.UserPoint()
+    new_user_point.id = uuid.uuid4()
+    new_user_point.points = order.points
+    new_user_point.order_id = params["order_id"]
+    new_user_point.user_id = wx_uid
+    new_user_point.operation_type = model.OperationType.ADD.value
+    new_user_point.description = f"订单{params['order_id']}录入"
 
-            order.is_used = 1
-            dao.update_order_point_by_id(order)
-            return make_succ_response({"id": user_points.id})
-        except Exception as e:
-            return make_err_response({"error": "录入积分失败！"})
-    else:
-        new_user_point = model.UserPoint()
-        new_user_point.id = uuid.uuid4()
-        new_user_point.points = order.points
-        new_user_point.order_id = params["order_id"]
-        new_user_point.user_id = wx_uid
-
-        try:
-            dao.insert_user_point(new_user_point)
-            order.is_used = 1
-            dao.update_order_point_by_id(order)
-            return make_succ_response({"id": new_user_point.id})
-        except Exception as e:
-            return make_err_response({"error": "录入积分失败！"})
+    try:
+        dao.insert_user_point(new_user_point)
+        order.is_used = 1
+        dao.update_order_point_by_id(order)
+        return make_succ_response({"id": new_user_point.id})
+    except Exception as e:
+        return make_err_response({"error": "录入积分失败！"})
 
 
 @points.route('/user', methods=['GET'])
@@ -127,8 +121,16 @@ def get_user_points():
     if wx_uid is None:
         return make_err_response({"error": "未获取到openid！"})
 
-    user_points = dao.get_user_point_by_openid(wx_uid)
-    if user_points is None:
+    user_points = dao.list_user_points_by_filters({"user_id": wx_uid})
+
+    if not user_points:
         return make_succ_response({"points": 0})
-    else:
-        return make_succ_response({"points": user_points.points})
+
+    total_points = 0
+    for point in user_points:
+        if point.operation_type == model.OperationType.ADD.value:
+            total_points += point.points
+        elif point.operation_type == model.OperationType.REDEEM.value:
+            total_points -= point.points
+
+    return make_succ_response({"points": total_points})
