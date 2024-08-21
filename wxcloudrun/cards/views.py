@@ -243,7 +243,7 @@ def list_user_collection():
                 value.append({
                     "id": str(uuid.uuid4()),
                     "name": "问号",
-                    "file_id": "cloud://prod-3gg7rthva2e1757e.7072-prod-3gg7rthva2e1757e-1327531447/activate/kakuang.png",
+                    "file_id": "cloud://prod-3gg7rthva2e1757e.7072-prod-3gg7rthva2e1757e-1327531447/activate/kakuang.webp",
                     "music_file_id": ""
                 })
         response.append({
