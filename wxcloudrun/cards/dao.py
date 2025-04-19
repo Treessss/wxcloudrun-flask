@@ -141,10 +141,15 @@ def list_user_collections_by_filter(filters=None):
 
         # 应用过滤条件
         for key, value in filters.items():
-            query = query.filter(getattr(UserCollection, key) == value)
+            if isinstance(value, dict) and "$in" in value:
+                # 处理 $in 操作符，使用 SQLAlchemy 的 in_ 方法
+                query = query.filter(getattr(UserCollection, key).in_(value["$in"]))
+            else:
+                # 处理普通的等值查询
+                query = query.filter(getattr(UserCollection, key) == value)
 
         # 执行查询并返回结果
         return query.all()
     except OperationalError as e:
-        logger.info(f"list_categories_by_filter errorMsg= {e}")
+        logger.info(f"list_user_collections_by_filter errorMsg= {e}")
         return []

@@ -218,6 +218,8 @@ def list_user_collection():
     category_data = {}
     categories = dao.list_categories_by_filter()
     for category in categories:
+        if category.name == "onepiece":
+            continue
         category_data[category.id] = category.name
 
     # 使用defaultdict来简化数据字典的创建，避免了显式检查和初始化的需要
@@ -253,6 +255,49 @@ def list_user_collection():
         })
 
     return make_succ_response(response)
+
+
+@cards.route('/onepiece', methods=["GET"])
+def list_user_onepiece_collection():
+    """
+    获取用户onepiece图鉴
+    :return:{
+        "category_id1":[
+            {
+                "id":"illustration_id",
+                "file_id": "file_id",
+                "name":"name"
+            }
+        ]
+    }
+    """
+    wx_uid = common.get_wx_uid(request)
+    if wx_uid is None:
+        return make_err_response({"error": "用户不存在，请登录"})
+
+
+    # 获取所有图鉴分类
+    categories = dao.list_categories_by_filter({"name":"onepiece"})
+
+    illustrations = dao.list_illustrations_by_filter({"category_id":categories[0].id})
+    illustration_ids = [illustration.id for illustration in illustrations]
+
+    # 使用defaultdict来简化数据字典的创建，避免了显式检查和初始化的需要
+    data = defaultdict(list)
+    # 获取用户所激活的图鉴
+    filters = {"user_id": wx_uid,"illustration_id":{"$in": illustration_ids}}
+    user_collections = dao.list_user_collections_by_filter(filters)
+    # 创建一个集合来存储用户激活的图鉴ID
+    activated_illustrations = set(collection.illustration_id for collection in user_collections)
+    for illustration in illustrations:
+        data[illustration.category_id].append({
+            "id": illustration.id,
+            "name": illustration.name,
+            "is_activated": illustration.id in activated_illustrations
+        })
+    
+
+    return make_succ_response(data)
 
 
 @cards.route('/user', methods=["POST"])
