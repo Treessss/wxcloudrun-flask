@@ -232,6 +232,8 @@ def list_user_collection():
     activated_illustrations = set(collection.illustration_id for collection in user_collections)
 
     for illustration in illustrations:
+        if illustration.category_id == "73055b4e-5634-4908-9e41-b6ecda0e9e0a":
+            continue
         data[illustration.category_id].append({
             "id": illustration.id,
             "name": illustration.name,
@@ -274,6 +276,9 @@ def list_user_onepiece_collection():
     wx_uid = common.get_wx_uid(request)
     if wx_uid is None:
         return make_err_response({"error": "用户不存在，请登录"})
+
+    print("i comming")
+    print (wx_uid)
 
 
     # 获取所有图鉴分类
